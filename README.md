@@ -15,7 +15,26 @@ JQuery Plugin for remote form validation to show errors and highlight errors wit
             ...
         <% end %>
 
-4. Finally, apply jquery plugin to your form
+4. Modifiy your controller to respond to json type. In example,
+
+        # POST /posts
+        # POST /posts.json
+        def create
+          @post = Post.new(params[:post])    
+    
+          respond_to do |format|
+            if @post.save
+              format.html { redirect_to @post }
+              format.json { render json: {:location=> url_for(@post)} , status: 302 }
+            else
+              format.html { render action: "new" }
+              format.json { render json: {:errors => @post.errors}, status: 422 }
+            end
+          end
+        end
+
+
+5. Finally, apply jquery plugin to your form
 
         $( function() {
           $("form[data-remote='true']").remoteValidation();
