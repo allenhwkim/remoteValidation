@@ -8,9 +8,9 @@ JQuery Plugin for remote form validation to show errors and highlight errors wit
     
         <script type="text/javascript" src="javascripts/remote_validation.js"></script>
 
-3. Change your form tag by sadding remote as true and format as json
+3. Change your form tag by adding remote as true and format as json
     
-        <%= form_for @post, *:remote => true, :format=>:json*, :html=> {:multipart => true}  do |f| %>
+        <%= form_for @post, :remote => true, :format=>:json, :html=> {:multipart => true}  do |f| %>
           <div id="error_messages"></div>
             ...
         <% end %>
