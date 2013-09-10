@@ -42,7 +42,7 @@
         var data = JSON.parse(xhr.responseText);
         if (data.errors) { // if data has error hash
           RemoteValidation.showErrors($this, settings, data.errors);
-        } else if (status > 400 and status < 500) { // i.e. 422 with no error hash
+        } else if (status > 400 && status < 500) { // i.e. 422 with no error hash
           RemoteValidation.showErrors($this, settings, data);
         } else if (data.location) {  // if 
           window.location.href = data.location;
