@@ -12,7 +12,7 @@
     },
     showErrors: function(form, settings, errors) {
       var errorList ="";
-      var formFor = $(form).attr('id').replace(/new_/,"");
+      var formFor = $(form).attr('id').replace(/new_|edit_/,"").replace(/_[0-9]+$/,"");
       var numErrors = 0;
       for (var col in errors) {
         for (var i in errors[col]) {
