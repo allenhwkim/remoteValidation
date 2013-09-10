@@ -31,12 +31,20 @@
         $(settings.messageContainer).empty();
         $("."+settings.errorClass, $this).children().unwrap();
       }).on('ajax:success', function(evt,data,status,xhr) {
+        if (typeof options.success == "function") {
+          options.success.apply(this, data, status, xhr);
+        }
       }).on('ajax:error', function(evt, xhr, status, error) {
+        if (typeof options.error == "function") {
+          options.error.apply(this, data, status, xhr);
+        }
       }).on('ajax:complete', function(evt, xhr, status){
         var data = JSON.parse(xhr.responseText);
-        if (data.errors) {
+        if (data.errors) { // if data has error hash
           RemoteValidation.showErrors($this, settings, data.errors);
-        } else if (data.location) {
+        } else if (status > 400 and status < 500) { // i.e. 422 with no error hash
+          RemoteValidation.showErrors($this, settings, data);
+        } else if (data.location) {  // if 
           window.location.href = data.location;
         }
       });
