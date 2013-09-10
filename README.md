@@ -1,6 +1,8 @@
 # remoteValidation
 JQuery Plugin for remote form validation to show errors and highlight errors without refreshing page.
 
+![Imgur](http://i.imgur.com/isq1ndx.png)
+
 ## Usage
 
 1. Download remote_validation.js into your public/javascripts
