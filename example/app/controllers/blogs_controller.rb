@@ -62,7 +62,7 @@ class BlogsController < ApplicationController
     respond_to do |format|
       if @blog.update_attributes(params[:blog])
         format.html { redirect_to @blog, notice: 'Blog was successfully updated.' }
-        format.json { head :no_content }
+        format.json { render json: @blog }
       else
         format.html { render action: "edit" }
         format.json { render json: @blog.errors, status: :unprocessable_entity }
