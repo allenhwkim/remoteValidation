@@ -6,9 +6,13 @@
       noErrorClass: 'field',
       errorClass : 'field_with_errors'
     },
+    resetErrors: function(form, settings) {
+       $(settings.messageContainer).empty();
+       $("."+settings.errorClass, form).children().unwrap();
+    },
     showErrors: function(form, settings, errors) {
       var errorList ="";
-      var formFor = form.attr('id').replace(/new_/,"");
+      var formFor = $(form).attr('id').replace(/new_/,"");
       var numErrors = 0;
       for (var col in errors) {
         for (var i in errors[col]) {
@@ -23,31 +27,49 @@
       $(settings.messageContainer).append(errorHtml);
     }
   };
+
   $.fn.remoteValidation = function(options) {
-    var settings = $.extend( RemoteValidation.defaults, options);
+    var settings = $.extend({}, RemoteValidation.defaults, options );
     return this.each( function() {
-      var $this = $(this); //$(this), may change inside function, so assign it to $this.
-      $this.on('ajax:beforeSend', function(evt,xhr) {
-        $(settings.messageContainer).empty();
-        $("."+settings.errorClass, $this).children().unwrap();
-      }).on('ajax:success', function(evt,data,status,xhr) {
-        if (typeof options.success == "function") {
-          options.success.apply(this, data, status, xhr);
-        }
-      }).on('ajax:error', function(evt, xhr, status, error) {
-        if (typeof options.error == "function") {
-          options.error.apply(this, data, status, xhr);
-        }
-      }).on('ajax:complete', function(evt, xhr, status){
-        var data = JSON.parse(xhr.responseText);
-        if (data.errors) { // if data has error hash
-          RemoteValidation.showErrors($this, settings, data.errors);
-        } else if (status > 400 && status < 500) { // i.e. 422 with no error hash
-          RemoteValidation.showErrors($this, settings, data);
-        } else if (data.location) {  // if 
-          window.location.href = data.location;
-        }
-      });
-    });
-  };
+      var $this = this; //$(this), may change inside function, so assign it to $this.
+      $(this).submit(function() {
+        $.ajax({
+          url: $(this).attr('action'),
+          type: $(this).attr('method') || 'GET', 
+          data: $(this).serializeArray(), 
+          dataType: $(this).data('type') || 'json',
+          crossDomain: null, 
+          beforeSend: function(xhr) {
+            RemoteValidation.resetErrors($this, settings);
+            if (typeof settings.beforeSend == 'function') {
+              settings.beforeSend.apply($this, [xhr]);
+            }
+          },
+          success: function(data, status, xhr) {
+            if (data.errors) { // 200 response, but errors are specified
+              RemoteValidation.showErrors($this, settings, data.errors);
+            } else if (data.location) {  // 200 response, but redirect required
+              window.location.href = data.location;
+            }
+            if (typeof settings.success == 'function') {
+              settings.success.apply($this, [data, status, xhr]);
+            }
+          },
+          error: function(xhr, status, error) {
+            var data = JSON.parse(xhr.responseText);
+            RemoteValidation.showErrors($this, settings, data);
+            if (typeof settings.error == 'function') {
+              settings.error.apply($this, [xhr, status, error]);
+            }
+          },
+          complete: function(xhr, status) {
+            if (typeof settings.complete == 'function') {
+              settings.complete.apply($this, [xhr, status]);
+            }
+          }
+        });
+        return false;
+      }); // $(this).submit
+    }) // return this.each
+  } // $.fn.remoteValidation
 })(jQuery);

@@ -1,0 +1,48 @@
+<script src="/remote_validation.js"></script>
+<script>
+$( function() {
+  $("form").remoteValidation({
+    beforeSend: function(xhr) { 
+      console.log("sending request",xhr) 
+    },
+    success: function(data, status, xhr) { 
+      console.log("received response", data, status, xhr) 
+    },
+    error: function(xhr, status, error) {
+      console.log("received error", xhr, status, error) 
+    },
+    complete: function(xhr, status) { 
+      console.log("complete ", xhr, status) 
+    },
+  });
+});
+</script>
+<%= form_for(@blog) do |f| %>
+  <!-- IMPORTANT!!! You need to wrap error section because #error_explanation never appears with no error -->
+  <!-- I can add dynamic error section right after the form tag, however I think it's better this way     -->
+  <div id="error_messages"> 
+    <% if @blog.errors.any? %>
+      <div id="error_explanation">
+        <h2><%= pluralize(@blog.errors.count, "error") %> prohibited this blog from being saved:</h2>
+
+        <ul>
+        <% @blog.errors.full_messages.each do |msg| %>
+          <li><%= msg %></li>
+        <% end %>
+        </ul>
+      </div>
+    <% end %>
+  </div>
+
+  <div class="field">
+    <%= f.label :title %><br />
+    <%= f.text_field :title %>
+  </div>
+  <div class="field">
+    <%= f.label :text %><br />
+    <%= f.text_field :text %>
+  </div>
+  <div class="actions">
+    <%= f.submit %>
+  </div>
+<% end %>
