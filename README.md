@@ -4,13 +4,14 @@ JQuery Plugin for remote form validation to show errors and highlight errors wit
 ## Usage
 
 1. Download remote_validation.js into your public/javascripts
+
 2. Add script tag for your view
     
         <script type="text/javascript" src="javascripts/remote_validation.js"></script>
 
-3. Change your form tag by adding remote as true and format as json
+3. add error section into your form tag. i.e. error_messages
     
-        <%= form_for @post, :remote => true, :format=>:json, :html=> {:multipart => true}  do |f| %>
+        <%= form_for @post do |f| %>
           <div id="error_messages"></div>
             ...
         <% end %>
@@ -47,8 +48,11 @@ If you may want to pass your own options for remote form valiation, you can pass
     var options= {
       messageContainer : '#error_messages',
       messageHtml : "<div id='error_explanation'><h2>{{NUM_ERRORS}} errors prohibited this post from being saved:</h2>{{ERRORS}}</div>",
-      noErrorClass: 'field',
-      errorClass : 'field_with_errors'
+      errorClass : 'field_with_errors',
+      beforeSend: beforeSend: function(xhr) { console.log("sending request",xhr) },
+      success: function(data, status, xhr) { console.log("received response", data, status, xhr) },
+      error: function(xhr, status, error) { console.log("received error", xhr, status, error) },
+      complete: function(xhr, status) { console.log("complete ", xhr, status) },
     };
     $("form[data-remote='true']").remoteValidation(options);
 
@@ -66,8 +70,32 @@ If you may want to pass your own options for remote form valiation, you can pass
 #### errorClass :
   will wrap the field of errors with div set by this class name
 
-#### noErrorClass : 
-  this does not affect any at this time.
+#### beforeSend : 
+  callback function for before ajax call is made
+
+#### success : 
+  callback function when validation has successful response(i.e, 200)
+
+#### error : 
+  callback function when validation has error response(i.e. 422)
+
+#### complete : 
+  callback function when ajax call is finished.
+
+## Example
+  To run this example application
+
+    1. $ git clone https://github.com/bighostkim/remoteValidation.git
+    2. $ cd remoteValidation/example
+    3. $ bundle install
+    4. $ rails server
+
+    open url, http://localhost:3000/blogs/new
+
+  For the exact implementation of this in example, please check the following files
+
+    1. app/controllers/blogs_controller.rb
+    2. app/views/blogs/_form.rb
 
 ## Copyright
 
